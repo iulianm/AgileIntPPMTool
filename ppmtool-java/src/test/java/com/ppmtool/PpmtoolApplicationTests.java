@@ -1,4 +1,4 @@
-package com.springreact.ppmtool;
+package com.ppmtool;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
