@@ -1,7 +1,9 @@
 package com.ppmtool.services;
 
+import com.ppmtool.domain.Backlog;
 import com.ppmtool.domain.Project;
 import com.ppmtool.exceptions.ProjectIdException;
+import com.ppmtool.repositories.BacklogRepository;
 import com.ppmtool.repositories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,12 +14,27 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private BacklogRepository backlogRepository;
+
     public Project saveOrUpdateProject(Project project){
         try {
             project.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+
+            if (project.getId() == null){
+                Backlog backlog = new Backlog();
+                project.setBacklog(backlog);
+                backlog.setProject(project);
+                backlog.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+            }
+
+            if(project.getId() != null){
+                project.setBacklog(backlogRepository.findByProjectIdentifier(project.getProjectIdentifier().toUpperCase()));
+            }
+
             return projectRepository.save(project);
         } catch (Exception e) {
-            throw new ProjectIdException("Project ID '" + project.getProjectIdentifier().toUpperCase() + "' already exists");
+            throw new ProjectIdException("Project with ID '" + project.getProjectIdentifier().toUpperCase() + "' already exists");
         }
     }
 
@@ -25,7 +42,7 @@ public class ProjectService {
         Project project =  projectRepository.findByProjectIdentifier(projectId.toUpperCase());
 
         if(project == null){
-            throw new ProjectIdException("Project ID '" + projectId + "' does not exist");
+            throw new ProjectIdException("Project with ID '" + projectId + "' does not exist");
         }
 
         return project;
