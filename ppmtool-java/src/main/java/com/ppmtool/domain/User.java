@@ -20,7 +20,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Email(message = "Username needs to be an email")
-    @NotBlank(message = "username is required")
+    @NotBlank(message = "Username is required")
     @Column(unique = true)
     private String username;
 
